@@ -36,7 +36,7 @@ class Room:
                  name: str,
                  desc: str,
                  exits,
-                 items: list[Item]) -> None:
+                 items) -> None:
         self.name = name
         self.desc = desc
         self.exits = exits
@@ -88,7 +88,7 @@ class Command:
 class World:
     """The World class. Contains a starting room, a list of commands, and at least one player."""
 
-    def __init__(self, start: Room, cmds: list[Command]) -> None:
+    def __init__(self, start: Room, cmds) -> None:
         self.room = start
         self.cmds = cmds
         self.players = [Player(start)]
