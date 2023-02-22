@@ -1,1 +1,2 @@
 Please make sure to use pylint with default settings *before* commiting. Also commit to a seperate branch with a pull request and pylint will analyze it and alert you if there are problems. Other then that, not much. If you add a lot of code for a specific purpose, then make a new folder with an `__init__.py` in it and put the code in that.
+Also, WE USE POETRY! Don't use pip with a requirements.txt, use poetry!
