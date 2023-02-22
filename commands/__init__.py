@@ -1,18 +1,6 @@
 """The command-related stuff in tapy."""
-
-
-def _get_loc_from_num(num):
-    if num == 0:
-        return 'north'
-    if num == 1:
-        return 'south'
-    if num == 2:
-        return 'east'
-    if num == 3:
-        return 'west'
-    if num == 4:
-        return 'up'
-    return 'down'
+from location import get_loc_from_num as _get_loc_from_num
+from messaging import error
 
 
 class Command:
@@ -33,11 +21,11 @@ class Command:
     def __repr__(self):
         return self.help()
 
-    def __call__(self, args):
-        self.func(args)
+    def __call__(self, *args):
+        self.func(*args)
 
 
-def look(_world, player):
+def look(_inp, _world, player):
     """Look around from the perspective of the Player passed in."""
     print(player.loc.name + ": " + player.loc.desc)
     if len(player.loc.items) > 0:
@@ -69,5 +57,13 @@ def look(_world, player):
             print(res, end='')
     print()
 
+def examine(inp, _world, player):
+    """Examine an item."""
+    inp = inp.replace("examine","",1)
+    if not inp in player.inventory.items and not inp in player.loc:
+        error("There's no object with that name!", player)
 
-globalcmds = [Command("look", look, "Look around the room")]
+
+globalcmds = [
+    Command("look", look, "Look around the room")
+]

@@ -1,5 +1,6 @@
 """A feature-rich text adventure framework in Python."""
 import sys
+import os
 from typing import Callable, Any, List
 import commands
 
@@ -67,6 +68,7 @@ class EnterEvent(Event):
 class Object:
     """A base Object. Do not use, instead use Item or Player."""
     events = {"move": MoveEvent()}
+    default_flags = {}
 
     def __init__(self, name: str, sdesc: str, ldesc: str, location):
         self.name = name
@@ -74,6 +76,7 @@ class Object:
         self.ldesc = ldesc
         self.loc = location
         self.iname = name
+        self.flags = self.__class__.default_flags
 
     @property
     def location(self):
@@ -100,6 +103,7 @@ class Object:
 class Item(Object):
     """An Item. Doesn't do much by default, although it can."""
     events = Object.events.update({"use": UseEvent()})
+    default_flags = {"consume_on_use": False, "pickup_to_examine": True}
 
     def move(self, newloc):
         super().move(newloc)
@@ -117,6 +121,7 @@ class Room:
 
     def __init__(self, name: str, desc: str, exits, items) -> None:
         self.name = name
+        self.iname = name
         self.desc = desc
         self.exits = exits
         self.items = items
@@ -147,17 +152,54 @@ class Room:
         """Trigger the enter event with the Player passed"""
         self.__class__.events["enter"].trigger(player)
 
+    def __contains__(self, key):
+        for i in self.items:
+            if key in (i.iname, i):
+                return True
+        for i in self.exits:
+            if key in (i.iname, i):
+                return True
+        return False
+
 
 class Player(Object):
-    """The player. Don't use, instead use World.create_player or just instance a new World."""
+    """A Player. Don't use, instead use World.create_player or just instance a new World."""
+    events = Object.events.update({})
+    default_flags = {}
 
-    def __init__(self, startloc: Room) -> None:
+    def __init__(self, startloc: Room, instream, outstream) -> None:
         super().__init__("player", "", "", startloc)
         self.inventory = Room("Inventory", "How did you get here?", [], [])
+        self.instream = instream
+        self.outstream = outstream
 
     def pickup(self, item: Item):
         """Pickup an item."""
         item.move(self.inventory)
+
+
+class Entity(Player):
+    """An Entity. Pretty much a slightly modified Player."""
+
+    def __init__(self, startloc: Room, file_name: str):
+        with open(file_name, 'r', encoding='ascii') as file:
+            with open(os.devnull, 'w', encoding='ascii') as null:
+                super().__init__(startloc, file, null)
+
+    def exec_from_file(self, file_name):
+        """Set the file executed from"""
+        with open(file_name, 'r', encoding='ascii') as file:
+            self.instream = file
+
+    def tick(self, world):
+        """Tickes the entity and makes it perform an action."""
+        self.exec(self.instream.readline(), world)
+
+    def exec(self, instruction, world):
+        """Executes an instruction for this Entity."""
+        for cmd in world.cmds:
+            if instruction.startswith(cmd.name):
+                cmd(instruction, world, self)
 
 
 class World:
@@ -172,16 +214,25 @@ class World:
             self.cmds = cmds()
         else:
             self.cmds = cmds
-        self.players = [Player(start)]
+        self.players = [Player(start, sys.stdin, sys.stdout)]
+        self.entities = []
 
     def run(self, prompt: str = "> ") -> None:
         """Runs the game"""
         while True:
-            inp = input(self.players[0].loc.name + prompt)
-            for cmd in self.cmds:
-                if inp.startswith(cmd.name):
-                    cmd(inp)
+            for i in self.players:
+                i.outstream.write(i.loc.name + prompt)
+                inp = i.instream.readline().replace("\n", "")
+                for cmd in self.cmds:
+                    if inp.startswith(cmd.name):
+                        cmd(inp, self, i)
+            for i in self.entities:
+                i.tick(self)
 
-    def create_player(self) -> None:
+    def create_player(self, instream, outstream) -> None:
         """Creates a new Player in this World."""
-        self.players.append(Player(self.room))
+        self.players.append(Player(self.room, instream, outstream))
+
+    def add_entity(self, entity: Entity) -> None:
+        """Adds an Entity to this World."""
+        self.entities.append(entity)
