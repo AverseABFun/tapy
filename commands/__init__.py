@@ -1,16 +1,20 @@
+"""The command-related stuff in tapy."""
+
+
 def _get_loc_from_num(num):
     if num == 0:
         return 'north'
-    elif num == 1:
+    if num == 1:
         return 'south'
-    elif num == 2:
+    if num == 2:
         return 'east'
-    elif num == 3:
+    if num == 3:
         return 'west'
-    elif num == 4:
+    if num == 4:
         return 'up'
-    elif num == 5:
-        return 'down'
+    return 'down'
+
+
 class Command:
     """A command, such as 'look' or 'examine'."""
 
@@ -28,11 +32,13 @@ class Command:
 
     def __repr__(self):
         return self.help()
+
     def __call__(self, args):
         self.func(args)
 
 
-def look(world, player):
+def look(_world, player):
+    """Look around from the perspective of the Player passed in."""
     print(player.loc.name + ": " + player.loc.desc)
     if len(player.loc.items) > 0:
         print("There is ", end="")
@@ -41,8 +47,7 @@ def look(world, player):
     print()
     nones = 0
     for i in player.loc.exits:
-        if not i:
-            nones = nones + 1
+        nones = nones + int(not i)
     if len(player.loc.exits) == 1 and nones != len(player.loc.exits):
         print("There is an exit ", end="")
     elif len(player.loc.exits) > 1 and nones != len(player.loc.exits):
@@ -57,7 +62,7 @@ def look(world, player):
                 res = 'below you'
             else:
                 res = 'to the ' + loc
-            if index == len(player.loc.exits)-1:
+            if index == len(player.loc.exits) - 1:
                 res = 'and ' + res + '.'
             else:
                 res = res + ', '
