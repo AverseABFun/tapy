@@ -3,6 +3,7 @@ import sys
 import os
 from typing import Callable, Any, List
 import commands
+from messaging import info, error, setinfomode, NOORIGIN, ORIGIN
 
 
 class _CONSTANTS:
@@ -90,13 +91,10 @@ class Object:
 
     def on_event(self, event_name: str, subscriber: Subscriber):
         """Makes subscriber be triggered when event_name is triggered."""
-        error = False
         try:
             self.__class__.events[event_name].add_subscriber(subscriber)
         except KeyError:
             sys.tracebacklimit = -1
-            error = True
-        if error:
             raise ValueError(f"Unknown event `{event_name}`")
 
 
@@ -104,6 +102,9 @@ class Item(Object):
     """An Item. Doesn't do much by default, although it can."""
     events = Object.events.update({"use": UseEvent()})
     default_flags = {"consume_on_use": False, "pickup_to_examine": True}
+    def __init__(self, name: str, sdesc: str, ldesc: str, location):
+        super().__init__(name, sdesc, ldesc, location)
+        location.items.append(self)
 
     def move(self, newloc):
         super().move(newloc)
@@ -115,8 +116,8 @@ class Item(Object):
 
 
 class Room:
-    """The Room class can contain a number of items and have 
-    up to 6 exits - up, down, north, south, east, and west."""
+    """The Room class can contain a number of items and have up to 6 exits:
+    up, down, north, south, east, and west."""
     events = {"enter": EnterEvent()}
 
     def __init__(self, name: str, desc: str, exits, items) -> None:
@@ -167,11 +168,12 @@ class Player(Object):
     events = Object.events.update({})
     default_flags = {}
 
-    def __init__(self, startloc: Room, instream, outstream) -> None:
+    def __init__(self, startloc: Room, instream, outstream, colored=True) -> None:
         super().__init__("player", "", "", startloc)
         self.inventory = Room("Inventory", "How did you get here?", [], [])
         self.instream = instream
         self.outstream = outstream
+        self.colored = colored
 
     def pickup(self, item: Item):
         """Pickup an item."""
@@ -182,6 +184,7 @@ class Entity(Player):
     """An Entity. Pretty much a slightly modified Player."""
 
     def __init__(self, startloc: Room, file_name: str):
+        self.colored = False
         with open(file_name, 'r', encoding='ascii') as file:
             with open(os.devnull, 'w', encoding='ascii') as null:
                 super().__init__(startloc, file, null)
@@ -220,12 +223,22 @@ class World:
     def run(self, prompt: str = "> ") -> None:
         """Runs the game"""
         while True:
-            for i in self.players:
-                i.outstream.write(i.loc.name + prompt)
-                inp = i.instream.readline().replace("\n", "")
+            for player in self.players:
+                setinfomode(NOORIGIN)
+                info(player.loc.name + prompt,)
+                player.outstream.flush()
+                sys.tracebacklimit = -1
+                inp = player.instream.readline().replace("\n", "")
+                sys.tracebacklimit = 1000
+                cmdCount = 0
                 for cmd in self.cmds:
                     if inp.startswith(cmd.name):
-                        cmd(inp, self, i)
+                        setinfomode(ORIGIN)
+                        cmd(inp, self, player)
+                    else:
+                        cmdCount += 1
+                if cmdCount == len(self.cmds):
+                    player.outstream.write()
             for i in self.entities:
                 i.tick(self)
 
@@ -236,3 +249,11 @@ class World:
     def add_entity(self, entity: Entity) -> None:
         """Adds an Entity to this World."""
         self.entities.append(entity)
+
+
+if __name__ == "__main__":
+    testroom = Room("testroom", "a room", [], [])
+    testroom.exits = [testroom,testroom,testroom,testroom,testroom,testroom]
+    testitem = Item("a test item", "a test item", "what were you expecting?", testroom)
+    testworld = World(testroom)
+    testworld.run()
