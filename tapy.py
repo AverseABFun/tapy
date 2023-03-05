@@ -1,6 +1,7 @@
 """A feature-rich text adventure framework in Python."""
 import sys
 import os
+from queue import LifoQueue
 from typing import Callable, Any, List
 import commands
 from messaging import info, setinfomode, no_origin, origin, error as err
@@ -32,7 +33,7 @@ class Subscriber:
     def __set__(self, key, val):
         self.events.append(val)
 
-    def add_event(self, event):
+    def subscribe(self, event):
         """Add an Event to this Subscriber"""
         self.events.append(event)
 
@@ -63,7 +64,11 @@ class UseEvent(Event):
 
 
 class EnterEvent(Event):
-    """A Event that is triggered when an Player enters a Room."""
+    """A Event that is triggered when a Player enters a Room."""
+
+
+class ChatEvent(Event):
+    """A Event that is triggered when a Player or Entity says a message."""
 
 
 class Object:
@@ -102,6 +107,7 @@ class Item(Object):
     """An Item. Doesn't do much by default, although it can."""
     events = Object.events.update({"use": UseEvent()})
     default_flags = {"consume_on_use": False, "pickup_to_examine": True}
+
     def __init__(self, name: str, sdesc: str, ldesc: str, location):
         super().__init__(name, sdesc, ldesc, location)
         location.items.append(self)
@@ -163,17 +169,33 @@ class Room:
         return False
 
 
+#pylint: disable-next=invalid-name
+numPlayers = 0
+
+
 class Player(Object):
     """A Player. Don't use, instead use World.create_player or just instance a new World."""
     events = Object.events.update({})
     default_flags = {}
 
-    def __init__(self, startloc: Room, instream, outstream, colored=True) -> None:
+    #pylint: disable-next=too-many-arguments
+    def __init__(self,
+                 startloc,
+                 instream,
+                 outstream,
+                 colored=True,
+                 name="Player"):
+        #pylint: disable-next=global-statement,invalid-name
+        global numPlayers
+        numPlayers += 1
+        if name == "Player":
+            name = "Player" + numPlayers
         super().__init__("player", "", "", startloc)
         self.inventory = Room("Inventory", "How did you get here?", [], [])
         self.instream = instream
         self.outstream = outstream
         self.colored = colored
+        self.name = name
 
     def pickup(self, item: Item):
         """Pickup an item."""
@@ -215,7 +237,8 @@ class Entity(Player):
             else:
                 break
         if cmd_count == len(world.cmds):
-            err("Invalid command. Run 'help' to get a list of commands.\n",sys.stdout)
+            err("Invalid command. Run 'help' to get a list of commands.\n",
+                sys.stdout)
 
 
 class World:
@@ -225,20 +248,24 @@ class World:
             self,
             start: Room,
             cmds: List[commands.Command] = _CONSTANTS.global_cmds) -> None:
-        self.room = start
+        self.start = start
         if callable(cmds):
             self.cmds = cmds()
         else:
             self.cmds = cmds
         self.players = [Player(start, sys.stdin, sys.stdout)]
         self.entities = []
+        self.chat = LifoQueue()
+        self.chat_event = ChatEvent()
+        self.chat_subscriber = Subscriber(self.new_chat)
+        self.chat_subscriber.subscribe(self.chat_event)
 
     def run(self, prompt: str = "> ") -> None:
         """Runs the game"""
         while True:
             for player in self.players:
                 setinfomode(no_origin)
-                info(player.loc.name + prompt,player)
+                info(player.loc.name + prompt, player)
                 player.outstream.flush()
                 sys.tracebacklimit = -1
                 inp = player.instream.readline().replace("\n", "")
@@ -258,23 +285,40 @@ class World:
                         cmd_count += 1
                     else:
                         break
-                if cmd_count == len(self.cmds):
-                    err("Invalid command. Run 'help' to get a list of commands.\n",player)
+                if cmd_count == len(self.cmds) and not inp == "":
+                    err(
+                        "Invalid command. Run 'help' to get a list of commands.\n",
+                        player)
             for i in self.entities:
                 i.tick(self)
 
     def create_player(self, instream, outstream) -> None:
         """Creates a new Player in this World."""
-        self.players.append(Player(self.room, instream, outstream))
+        self.players.append(Player(self.start, instream, outstream))
 
     def add_entity(self, entity: Entity) -> None:
         """Adds an Entity to this World."""
         self.entities.append(entity)
 
+    def new_chat(self, message, source, local=None) -> None:
+        #pylint: disable-next=line-too-long
+        """DO NOT USE. Instead run World.chat_event.trigger(message: str, source: str, local: NoneType or Room"""
+        self.chat.put(source + " says: " + message)
+        if not local:
+            for player in self.players:
+                info(source + " says: " + message, player)
+            return
+        for player in self.players:
+            if player.loc == local:
+                info(source + " says: " + message, player)
+
 
 if __name__ == "__main__":
     testroom = Room("testroom", "a room", [], [])
-    testroom.exits = [testroom,testroom,testroom,testroom,testroom,testroom]
-    testitem = Item("a test item", "a test item", "what were you expecting?", testroom)
+    testroom.exits = [
+        testroom, testroom, testroom, testroom, testroom, testroom
+    ]
+    testitem = Item("a test item", "a test item", "what were you expecting?",
+                    testroom)
     testworld = World(testroom)
     testworld.run()
