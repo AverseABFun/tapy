@@ -28,8 +28,17 @@ def info(message, target):
 def ocolored(message, target, color):
     """Print an colored message to the target if it is supported."""
     if target.colored:
-        target.outstream.write(
-            colored(inspect.stack()[1].function + ": " + message, color))
+        if inspect.stack == origin:
+            target.outstream.write(
+                colored(inspect.stack()[1].function.upper() + ": " + message, color)
+            )
+        else:
+            target.outstream.write(
+                colored(message, color)
+            )
     else:
-        target.outstream.write(inspect.stack()[1].function.upper() + ": " + message)
+        if inspect.stack == origin:
+            target.outstream.write(inspect.stack()[1].function.upper() + ": " + message)
+        else:
+            target.outstream.write(message)
     target.outstream.flush()

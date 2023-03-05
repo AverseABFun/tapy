@@ -1,5 +1,7 @@
 """A implementation of colored text."""
 BLACK = "\u001b[30m"
+GREY = "\u001b[30m"
+GRAY = "\u001b[30m"
 RED = "\u001b[31m"
 GREEN = "\u001b[32m"
 YELLOW = "\u001b[33m"

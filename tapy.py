@@ -55,7 +55,7 @@ class Event:
 
 
 class MoveEvent(Event):
-    """A Event that is triggered when an Object is moved."""
+    """A Event that is triggered when an Object is moved(Includes the player picking it up)."""
 
 
 class UseEvent(Event):
@@ -181,7 +181,7 @@ class Player(Object):
 
 
 class Entity(Player):
-    """An Entity. Pretty much a slightly modified Player."""
+    """An Entity. Can be described as a scripted player."""
 
     def __init__(self, startloc: Room, file_name: str):
         self.colored = False
@@ -200,9 +200,23 @@ class Entity(Player):
 
     def exec(self, instruction, world):
         """Executes an instruction for this Entity."""
+        cmd_count = 0
         for cmd in world.cmds:
-            if instruction.startswith(cmd.name):
-                cmd(instruction, world, self)
+            for alias in cmd.aliases:
+                if instruction.startswith(alias):
+                    setinfomode(origin)
+                    cmd(instruction, world, self)
+                    found = True
+                    break
+                else:
+                    cmd_count += 1
+            cmd_count -= len(cmd.aliases)
+            if not found:
+                cmd_count += 1
+            else:
+                break
+        if cmd_count == len(world.cmds):
+            err("Invalid command. Run 'help' to get a list of commands.\n",sys.stdout)
 
 
 class World:
@@ -231,14 +245,23 @@ class World:
                 inp = player.instream.readline().replace("\n", "")
                 sys.tracebacklimit = 1000
                 cmd_count = 0
+                found = False
                 for cmd in self.cmds:
-                    if inp.startswith(cmd.name):
-                        setinfomode(origin)
-                        cmd(inp, self, player)
-                    else:
+                    for alias in cmd.aliases:
+                        if inp.startswith(alias):
+                            setinfomode(origin)
+                            cmd(inp, self, player)
+                            found = True
+                            break
+                        else:
+                            cmd_count += 1
+                    cmd_count -= len(cmd.aliases)
+                    if not found:
                         cmd_count += 1
+                    else:
+                        break
                 if cmd_count == len(self.cmds):
-                    err("Invalid command",player)
+                    err("Invalid command. Run 'help' to get a list of commands.\n",player)
             for i in self.entities:
                 i.tick(self)
 
