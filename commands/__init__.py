@@ -7,11 +7,14 @@ from color import colored
 class Command:
     """A command, such as 'look' or 'examine'."""
 
-    def __init__(self, name: str, func, desc: str, ldesc: str, aliases=[]):
+#pylint: disable-next=too-many-arguments
+    def __init__(self, name: str, func, desc: str, ldesc: str, aliases=None):
         self.name = name
         self.func = func
         self.desc = desc
         self.ldesc = ldesc
+        if aliases is None:
+            aliases = []
         self.aliases = [name] + aliases
 
     def help(self):
@@ -85,6 +88,7 @@ def examine(inp, _world, player):
     setinfomode(origin)
 
 def tahelp(inp, world, player):
+    """The help command. Named 'tahelp' so that it won't override the builtin function 'help'"""
     inp = inp.replace("help","",1).strip()
     setinfomode(no_origin)
     if inp != "":
@@ -93,7 +97,7 @@ def tahelp(inp, world, player):
                 info(colored(i.name + ": " + i.ldesc + '\n', 'blue'),player)
                 setinfomode(origin)
                 return
-        error("There's no command with that name! Run 'help' by itself to get a list of commands.",player)
+        error("There's no command with that name! Run 'help' to get a list of commands.\n",player)
     for index, val in enumerate(world.cmds):
         if index%2 == 0:
             info(colored(val.help()+'\n','yellow'),player)
@@ -103,7 +107,7 @@ def tahelp(inp, world, player):
 
 
 globalcmds = [
-    Command("help", tahelp, "Get help on the commands", "Why are you so curious about the help command?"),
-    Command("look", look, "Look around the room", "Look around the room that the current player is in"),
-    Command("examine", examine, "Examine an item", "Examine an item closely and get more information on it")
+    Command("help", tahelp, "Get help on the commands", "It's the help command."),
+    Command("look", look, "Look around the room", "Look at the room that the current player is in"),
+    Command("examine", examine, "Examine an item", "Examine an item closely to get more info")
 ]

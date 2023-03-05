@@ -208,8 +208,7 @@ class Entity(Player):
                     cmd(instruction, world, self)
                     found = True
                     break
-                else:
-                    cmd_count += 1
+                cmd_count += 1
             cmd_count -= len(cmd.aliases)
             if not found:
                 cmd_count += 1
@@ -253,8 +252,7 @@ class World:
                             cmd(inp, self, player)
                             found = True
                             break
-                        else:
-                            cmd_count += 1
+                        cmd_count += 1
                     cmd_count -= len(cmd.aliases)
                     if not found:
                         cmd_count += 1
