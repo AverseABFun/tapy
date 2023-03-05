@@ -3,7 +3,7 @@ import sys
 import os
 from typing import Callable, Any, List
 import commands
-from messaging import info, error, setinfomode, NOORIGIN, ORIGIN
+from messaging import info, setinfomode, no_origin, origin, error as err
 
 
 class _CONSTANTS:
@@ -93,9 +93,9 @@ class Object:
         """Makes subscriber be triggered when event_name is triggered."""
         try:
             self.__class__.events[event_name].add_subscriber(subscriber)
-        except KeyError:
+        except KeyError as exc:
             sys.tracebacklimit = -1
-            raise ValueError(f"Unknown event `{event_name}`")
+            raise ValueError(f"Unknown event `{event_name}`") from exc
 
 
 class Item(Object):
@@ -224,21 +224,21 @@ class World:
         """Runs the game"""
         while True:
             for player in self.players:
-                setinfomode(NOORIGIN)
-                info(player.loc.name + prompt,)
+                setinfomode(no_origin)
+                info(player.loc.name + prompt,player)
                 player.outstream.flush()
                 sys.tracebacklimit = -1
                 inp = player.instream.readline().replace("\n", "")
                 sys.tracebacklimit = 1000
-                cmdCount = 0
+                cmd_count = 0
                 for cmd in self.cmds:
                     if inp.startswith(cmd.name):
-                        setinfomode(ORIGIN)
+                        setinfomode(origin)
                         cmd(inp, self, player)
                     else:
-                        cmdCount += 1
-                if cmdCount == len(self.cmds):
-                    player.outstream.write()
+                        cmd_count += 1
+                if cmd_count == len(self.cmds):
+                    err("Invalid command",player)
             for i in self.entities:
                 i.tick(self)
 

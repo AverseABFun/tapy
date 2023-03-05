@@ -4,8 +4,10 @@ import inspect
 
 from color import colored
 
-NOORIGIN = lambda: [FrameInfo('',0,'','',0,0),FrameInfo('',0,'','',0,0)]
-ORIGIN = inspect.stack
+def no_origin():
+    """The no origin mode of logging."""
+    return [FrameInfo('',0,'','',0,0),FrameInfo('',0,'','',0,0)]
+origin = inspect.stack
 
 
 def setinfomode(mode):
@@ -15,23 +17,12 @@ def setinfomode(mode):
 
 def error(message, target):
     """Print an error to the target."""
-    if target.colored:
-        target.outstream.write(
-            colored(inspect.stack()[1].function + ": " + message, 'red'))
-    else:
-        target.outstream.write('ERROR: ' + inspect.stack()[1].function + ": " +
-                               message)
-    target.outstream.flush()
+    ocolored(message, target, 'red')
 
 
 def info(message, target):
     """Print an info message to the target"""
-    if target.colored:
-        target.outstream.write(
-            colored(inspect.stack()[1].function + message, 'grey'))
-    else:
-        target.outstream.write(inspect.stack()[1].function + ": " + message)
-    target.outstream.flush()
+    ocolored(message, target, 'black')
 
 
 def ocolored(message, target, color):
@@ -40,8 +31,5 @@ def ocolored(message, target, color):
         target.outstream.write(
             colored(inspect.stack()[1].function + ": " + message, color))
     else:
-        target.outstream.write(inspect.stack()[1].function + ": " + message)
+        target.outstream.write(inspect.stack()[1].function.upper() + ": " + message)
     target.outstream.flush()
-
-def tcolored(message, color):
-    return colored(message, color)
