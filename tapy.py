@@ -211,6 +211,7 @@ class Entity(Player):
         self.colored = False
         self.prevcontext = 0
         self.context = 0
+        self.file_name = file_name
         with open(file_name, 'r', encoding='ascii') as file:
             with open(os.devnull, 'w', encoding='ascii') as null:
                 super().__init__(startloc, file, null, colored=False)
@@ -222,6 +223,10 @@ class Entity(Player):
 
     def tick(self, world):
         """Tickes the entity and makes it perform an action."""
+        #pylint: disable=consider-using-with
+        self.instream = open(self.file_name, 'r', encoding='ascii')
+        self.outstream = open(os.devnull, 'w', encoding='ascii')
+        #pylint: enable=consider-using-with
         self.exec(self.instream.readline(), world)
 
     def exec(self, instruction, world):
@@ -230,8 +235,12 @@ class Entity(Player):
         if self.context == "skip" and instruction == "}":
             self.context = self.prevcontext
             return ""
-        if self.context > 0 and instruction == "}":
-            self.context -= 1
+        try:
+            if self.context > 0 and instruction == "}":
+                self.context -= 1
+        except TypeError:
+            pass
+        found = False
         for cmd in world.cmds:
             for alias in cmd.aliases:
                 if instruction.startswith(alias) and self.context != "skip":
@@ -248,7 +257,7 @@ class Entity(Player):
             else:
                 break
         if cmd_count == len(world.cmds):
-            entity = Player(None, sys.devnull, sys.stdout)
+            entity = Player(None, os.devnull, sys.stdout)
             err("Invalid command. Run 'help' to get a list of commands.\n",
                 entity)
             return ""
@@ -337,5 +346,7 @@ if __name__ == "__main__":
     ]
     testitem = Item("a test item", "a test item", "what were you expecting?",
                     testroom)
+    testentity = Entity(testroom, "test.entity")
     testworld = World(testroom)
+    testworld.add_entity(testentity)
     testworld.run()

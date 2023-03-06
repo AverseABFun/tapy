@@ -193,5 +193,5 @@ globalcmds = [
     Command("chat", list_chat, "List the chat messages",
             "That's pretty much it", ["list chat"]),
     Command("if", taif, "", ""),
-    Command("said", said, "", ""),
+    Command("said", said, "", "")
 ]
