@@ -109,6 +109,9 @@ def tahelp(inp, world, player):
             "There's no command with that name! Run 'help' to get a list of commands.\n",
             player)
     for index, val in enumerate(world.cmds):
+        if val.name in ["if", "said"
+                        ] and not player.__class__.__name__ == "Entity":
+            continue
         if index % 2 == 0:
             info(colored(val.help() + '\n', 'yellow'), player)
         elif index % 2 == 1:
@@ -123,13 +126,53 @@ def move(_inp, _world, _player):
 def say(inp, world, player):
     """Say something in the room you are in"""
     inp = inp.replace("say", "", 1).strip()
-    world.chatEvent.trigger(inp, player.name, local=player.loc)
+    world.chat_event.trigger(inp, player.name, local=player.loc)
 
 
 def announce(inp, world, player):
     """Announce something to the entire World"""
     inp = inp.replace("announce", "", 1).strip()
-    world.chatEvent.trigger(inp, player.name, local=None)
+    world.chat_event.trigger(inp, player.name, local=None)
+
+
+def list_chat(_inp, world, player):
+    """List all chat messages in this World"""
+    setinfomode(no_origin)
+    for i in world.chat:
+        info(i + "\n", player)
+    setinfomode(origin)
+
+
+def taif(inp, world, player):
+    #pylint: disable-next=line-too-long
+    """For Entities, this command is useful for shops or other similar things, because you can test if the player says or does something."""
+    inp = inp.replace("if", "", 1).strip()
+    try:
+        result = player.exec(inp.replace("}", "", 1).strip(), world)
+    except AttributeError:
+        error("Sorry, the 'if' command only works for Entities.", player)
+        return
+    if result:
+        player.context += 1
+    else:
+        player.prevcontext = player.context
+        player.context = "skip"
+
+
+def said(inp, world, player):
+    """Test if something has been said(for entities only)"""
+    inp = inp.replace("said", "", 1).strip()
+    try:
+        player.exec("look", world)
+    except AttributeError:
+        error("Sorry, the 'said' command only works for Entities.", player)
+    for i in world.chat:
+        ali = i.replace("says: ","")
+        tmp = ali.split(" ")[0]
+        ali = ali.replace(tmp,"").strip()
+        if inp in (i, ali):
+            return True
+    return False
 
 
 globalcmds = [
@@ -146,5 +189,9 @@ globalcmds = [
         "Unlike 'announce', it will only say something to the room you are currently in"
     ),
     Command("announce", announce, "Announce something to the entire World",
-            "Unlike 'say', this command says something to the entire World")
+            "Unlike 'say', this command says something to the entire World"),
+    Command("chat", list_chat, "List the chat messages",
+            "That's pretty much it", ["list chat"]),
+    Command("if", taif, "", ""),
+    Command("said", said, "", ""),
 ]

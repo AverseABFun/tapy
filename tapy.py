@@ -1,7 +1,6 @@
 """A feature-rich text adventure framework in Python."""
 import sys
 import os
-from queue import LifoQueue
 from typing import Callable, Any, List
 import commands
 from messaging import info, setinfomode, no_origin, origin, error as err
@@ -36,6 +35,7 @@ class Subscriber:
     def subscribe(self, event):
         """Add an Event to this Subscriber"""
         self.events.append(event)
+        event.subscribers.append(self)
 
 
 class Event:
@@ -47,10 +47,12 @@ class Event:
     def add_subscriber(self, subscriber: Subscriber):
         """Add an subscriber to this Event"""
         self.subscribers.append(subscriber)
-        subscriber.add_event(self)
+        subscriber.events.append(self)
 
     def trigger(self, *args, **kwargs):
         """Trigger this Event with one or more arguments"""
+        #entity = Entity(None,"none.entity")
+        #entity.outstream = sys.stdout
         for sub in self.subscribers:
             sub(*args, **kwargs)
 
@@ -189,7 +191,7 @@ class Player(Object):
         global numPlayers
         numPlayers += 1
         if name == "Player":
-            name = "Player" + numPlayers
+            name = "Player" + str(numPlayers)
         super().__init__("player", "", "", startloc)
         self.inventory = Room("Inventory", "How did you get here?", [], [])
         self.instream = instream
@@ -207,9 +209,11 @@ class Entity(Player):
 
     def __init__(self, startloc: Room, file_name: str):
         self.colored = False
+        self.prevcontext = 0
+        self.context = 0
         with open(file_name, 'r', encoding='ascii') as file:
             with open(os.devnull, 'w', encoding='ascii') as null:
-                super().__init__(startloc, file, null)
+                super().__init__(startloc, file, null, colored=False)
 
     def exec_from_file(self, file_name):
         """Set the file executed from"""
@@ -223,11 +227,18 @@ class Entity(Player):
     def exec(self, instruction, world):
         """Executes an instruction for this Entity."""
         cmd_count = 0
+        if self.context == "skip" and instruction == "}":
+            self.context = self.prevcontext
+            return ""
+        if self.context > 0 and instruction == "}":
+            self.context -= 1
         for cmd in world.cmds:
             for alias in cmd.aliases:
-                if instruction.startswith(alias):
+                if instruction.startswith(alias) and self.context != "skip":
                     setinfomode(origin)
-                    cmd(instruction, world, self)
+                    test = cmd(instruction, world, self)
+                    if test:
+                        return test
                     found = True
                     break
                 cmd_count += 1
@@ -237,8 +248,11 @@ class Entity(Player):
             else:
                 break
         if cmd_count == len(world.cmds):
+            entity = Player(None, sys.devnull, sys.stdout)
             err("Invalid command. Run 'help' to get a list of commands.\n",
-                sys.stdout)
+                entity)
+            return ""
+        return ""
 
 
 class World:
@@ -255,10 +269,10 @@ class World:
             self.cmds = cmds
         self.players = [Player(start, sys.stdin, sys.stdout)]
         self.entities = []
-        self.chat = LifoQueue()
+        self.chat = []
         self.chat_event = ChatEvent()
         self.chat_subscriber = Subscriber(self.new_chat)
-        self.chat_subscriber.subscribe(self.chat_event)
+        self.chat_event.add_subscriber(self.chat_subscriber)
 
     def run(self, prompt: str = "> ") -> None:
         """Runs the game"""
@@ -303,14 +317,17 @@ class World:
     def new_chat(self, message, source, local=None) -> None:
         #pylint: disable-next=line-too-long
         """DO NOT USE. Instead run World.chat_event.trigger(message: str, source: str, local: NoneType or Room"""
-        self.chat.put(source + " says: " + message)
-        if not local:
+        self.chat.append(source + " says: " + message)
+        setinfomode(no_origin)
+        if local is None:
             for player in self.players:
-                info(source + " says: " + message, player)
+                info(source + " says: " + message + "\n", player)
+            setinfomode(origin)
             return
         for player in self.players:
             if player.loc == local:
-                info(source + " says: " + message, player)
+                info(source + " says: " + message + "\n", player)
+        setinfomode(origin)
 
 
 if __name__ == "__main__":
