@@ -24,11 +24,10 @@ jobs:
       run: |
         mkdir tapy-nightly
         cp -r tapy/* tapy-nightly
-        cp pyproject.toml tapy-nightly
-        cp poetry.lock tapy-nightly
+        rm pyproject.toml
+        mv pyproject-nightly.toml pyproject.toml
     - name: Build package
       run: |
-        cd tapy-nightly
         poetry build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
