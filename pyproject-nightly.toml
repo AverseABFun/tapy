@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tapy-nightly"
-version = "1.0-nightly"
+version = "110105103104116108121110105103104116108121.0"
 description = ""
 authors = ["sdft <averse.abfun@gmail.com>"]
 
