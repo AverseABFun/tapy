@@ -1,4 +1,4 @@
-name: Upload Python Package
+name: Upload Nightly Python Package
 
 on: push
 
@@ -21,7 +21,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
     - name: Copy to nightly folder
-      run: cp tapy tapy-nightly
+      run: cp -r tapy tapy-nightly
     - name: Build package
       run: poetry build tapy-nightly
     - name: Publish package
