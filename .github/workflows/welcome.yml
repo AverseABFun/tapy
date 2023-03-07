@@ -1,13 +1,15 @@
 name: Welcome
 
-on: [push]
+on:
+  issues:
+    types:
+      - opened
+  pull_request:
+    types: opened
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.8", "3.9", "3.10"]
     steps:
     - uses: actions/checkout@v3
     - name: welcome-new-contributors
