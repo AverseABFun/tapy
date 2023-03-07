@@ -22,7 +22,6 @@ jobs:
         pip install poetry
     - name: Copy to nightly folder
       run: |
-        mkdir tapy-nightly
         cp -r tapy/* tapy-nightly
         rm pyproject.toml
         mv pyproject-nightly.toml pyproject.toml
