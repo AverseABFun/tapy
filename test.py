@@ -1,5 +1,6 @@
-from tapy import Room, Item, Entity, World
+"""Tests for tapy"""
 from os import system
+from tapy import Room, Item, Entity, World
 if __name__ == "__main__":
     system("pip install pylint")
     system("pylint */*.py */*/*.py")
