@@ -1,0 +1,25 @@
+name: Welcome
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.8", "3.9", "3.10"]
+    steps:
+    - uses: actions/checkout@v3
+    - name: welcome-new-contributors
+  # You may pin to the exact commit or the version.
+  # uses: garg3133/welcome-new-contributors@a38583ed8282e23d63d7bf919ca2d9fb95300ca6
+      uses: garg3133/welcome-new-contributors@v1.2
+      with:
+        # The GITHUB_TOKEN to access your repository or OAUTH_TOKEN to use your bot github account.
+        token: ${{ secrets.GITHUB_TOKEN }}
+        # Is the token provided above an OAUTH_TOKEN? (Bot account should be a collaborator on your repo.)
+        is-oauth-token: false
+        # Welcome message for new issue.
+        issue-message: Welcome to `tapy`! If you know how to fix this issue, then just make a new PR(Pull Request) and link it to this issue.
+        # Welcome message for new issue.
+        pr-message: Welcome to `tapy`! If this solves an issue, then just link it to this PR.
