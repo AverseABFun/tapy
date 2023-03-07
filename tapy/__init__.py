@@ -2,8 +2,8 @@
 import sys
 import os
 from typing import Callable, Any, List
-import commands
-from messaging import info, setinfomode, no_origin, origin, error as err
+import tapy.commands as commands
+from tapy.messaging import info, setinfomode, no_origin, origin, error as err
 
 
 class _CONSTANTS:
@@ -337,16 +337,3 @@ class World:
             if player.loc == local:
                 info(source + " says: " + message + "\n", player)
         setinfomode(origin)
-
-
-if __name__ == "__main__":
-    testroom = Room("testroom", "a room", [], [])
-    testroom.exits = [
-        testroom, testroom, testroom, testroom, testroom, testroom
-    ]
-    testitem = Item("a test item", "a test item", "what were you expecting?",
-                    testroom)
-    testentity = Entity(testroom, "test.entity")
-    testworld = World(testroom)
-    testworld.add_entity(testentity)
-    testworld.run()

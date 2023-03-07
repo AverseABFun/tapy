@@ -2,7 +2,7 @@
 from inspect import FrameInfo
 import inspect
 
-from color import colored
+from tapy.color import colored
 
 def no_origin():
     """The no origin mode of logging."""
