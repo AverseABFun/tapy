@@ -21,9 +21,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
     - name: Copy to nightly folder
-      run: cp -r tapy tapy-nightly
+      run: |
+        cp -r tapy/* tapy-nightly
+        cp pyproject.toml tapy-nightly
+        cp poetry.lock tapy-nightly
     - name: Build package
-      run: poetry build tapy-nightly
+      run: |
+        cd tapy-nightly
+        poetry build
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
