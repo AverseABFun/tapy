@@ -174,6 +174,15 @@ def said(inp, world, player):
             return True
     return False
 
+def get(inp, _world, player):
+    """Get an item"""
+    inp = inp.replace("get", "", 1).strip().replace("take", "", 1).strip()
+    for i in player.loc.items:
+        if i.name == inp:
+            player.pickup(i)
+            return
+    error("There's no item with that name in the room!", player)
+
 
 globalcmds = [
     Command("help", tahelp, "Get help on the commands",
@@ -192,6 +201,7 @@ globalcmds = [
             "Unlike 'say', this command says something to the entire World"),
     Command("chat", list_chat, "List the chat messages",
             "That's pretty much it", ["list chat"]),
+    Command("get", get, "Take/get an item", "Are you a 'TAKE' person or a 'GET' person?", ["take"]),
     Command("if", taif, "", ""),
     Command("said", said, "", "")
 ]

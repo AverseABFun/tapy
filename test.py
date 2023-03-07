@@ -1,5 +1,8 @@
 from tapy import Room, Item, Entity, World
+from os import system
 if __name__ == "__main__":
+    system("pip install pylint")
+    system("pylint */*.py */*/*.py")
     testroom = Room("testroom", "a room", [], [])
     testroom.exits = [
         testroom, testroom, testroom, testroom, testroom, testroom

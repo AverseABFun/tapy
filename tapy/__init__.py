@@ -2,7 +2,7 @@
 import sys
 import os
 from typing import Callable, Any, List
-import tapy.commands as commands
+from tapy import commands
 from tapy.messaging import info, setinfomode, no_origin, origin, error as err
 
 
@@ -297,7 +297,7 @@ class World:
                 found = False
                 for cmd in self.cmds:
                     for alias in cmd.aliases:
-                        if inp.startswith(alias):
+                        if inp.lower().startswith(alias.lower()):
                             setinfomode(origin)
                             cmd(inp, self, player)
                             found = True
