@@ -3,6 +3,9 @@ name = "tapy-nightly"
 version = "110105103104116108121110105103104116108121.0"
 description = ""
 authors = ["sdft <averse.abfun@gmail.com>"]
+packages = [
+    { include = "tapy-nightly" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"

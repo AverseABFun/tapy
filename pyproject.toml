@@ -3,6 +3,9 @@ name = "tapy"
 version = "1.0-beta2"
 description = ""
 authors = ["sdft <averse.abfun@gmail.com>"]
+packages = [
+    { include = "tapy" }
+]
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"
