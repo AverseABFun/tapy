@@ -1,7 +1,8 @@
 [tool.poetry]
 name = "tapy"
 version = "1.0-beta2"
-description = ""
+description = "A feature-rich text adventure library! Supports story files, although currently only a custom format."
+readme = {file = "BUILD_DESC.md", content-type = "text/markdown"}
 authors = ["sdft <averse.abfun@gmail.com>"]
 packages = [
     { include = "tapy" }
