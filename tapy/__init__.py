@@ -21,8 +21,9 @@ _CONSTANTS = _CONSTANTS()
 
 class Subscriber:
     """A Subscriber to an Event"""
+    save = ["func", "events"]
 
-    def __init__(self, func: Callable[[Any], Any]):
+    def __init__(self, func):
         self.func = func
         self.events = []
 
@@ -37,9 +38,14 @@ class Subscriber:
         self.events.append(event)
         event.subscribers.append(self)
 
+    def __getitem__(self, key):
+        """get item"""
+        return self.__dict__[key]
+
 
 class Event:
     """An Event that can have multiple Subscribers"""
+    save = []
 
     def __init__(self):
         self.subscribers = []
@@ -55,6 +61,10 @@ class Event:
         #entity.outstream = sys.stdout
         for sub in self.subscribers:
             sub(*args, **kwargs)
+
+    def __getitem__(self, key):
+        """get item"""
+        return self.__dict__[key]
 
 
 class MoveEvent(Event):
@@ -103,6 +113,10 @@ class Object:
         except KeyError as exc:
             sys.tracebacklimit = -1
             raise ValueError(f"Unknown event `{event_name}`") from exc
+
+    def __getitem__(self, key):
+        """get item"""
+        return self.__dict__[key]
 
 
 class Item(Object):
@@ -169,6 +183,10 @@ class Room:
             if key in (i.iname, i):
                 return True
         return False
+
+    def __getitem__(self, key):
+        """get item"""
+        return self.__dict__[key]
 
 
 #pylint: disable-next=invalid-name
@@ -337,3 +355,7 @@ class World:
             if player.loc == local:
                 info(source + " says: " + message + "\n", player)
         setinfomode(origin)
+
+    def __getitem__(self, key):
+        """get item"""
+        return self.__dict__[key]

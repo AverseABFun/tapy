@@ -1,3 +1,4 @@
 #!/bin/sh
 rm -r tapy
-cp -r tapy_nightly tapy
+mkdir tapy
+cp -r tapy_nightly/* tapy/
