@@ -6,7 +6,7 @@ readme = "txtadv_nightly/BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
 license = "MIT"
 packages = [
-    { include = "txtadv-nightly" }
+    { include = "txtadv_nightly" }
 ]
 
 [tool.poetry.dependencies]
