@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "tapy-nightly"
+name = "tapy_nightly"
 version = "110105103104116108121110105103104116108121.0"
 description = "The nightly version of tapy, a feature-rich text adventure library!"
 readme = {file = "tapy-nightly/BUILD_DESC.md", content-type = "text/markdown"}

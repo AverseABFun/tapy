@@ -1,3 +1,3 @@
 #!/bin/sh
 rm -r tapy
-mv tapy-nightly tapy
+cp -r tapy_nightly tapy
