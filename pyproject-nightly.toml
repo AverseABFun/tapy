@@ -2,8 +2,9 @@
 name = "txtadv_nightly"
 version = "110105103104116108121110105103104116108121.0"
 description = "The nightly version of txtadv, a feature-rich text adventure library!"
-readme = {file = "txtadv_nightly/BUILD_DESC.md", content-type = "text/markdown"}
+readme = "txtadv_nightly/BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
+license = "MIT"
 packages = [
     { include = "txtadv-nightly" }
 ]

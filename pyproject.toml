@@ -2,8 +2,9 @@
 name = "txtadv"
 version = "1.0-beta2"
 description = "A feature-rich text adventure library! Supports story files, although currently only a custom format."
-readme = {file = "BUILD_DESC.md", content-type = "text/markdown"}
+readme = "BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
+license = "MIT"
 packages = [
     { include = "txtadv" }
 ]
