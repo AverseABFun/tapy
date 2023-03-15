@@ -2,8 +2,8 @@
 import sys
 import os
 from typing import Callable, Any, List
-from tapy import commands
-from tapy.messaging import info, setinfomode, no_origin, origin, error as err
+from txtadv import commands
+from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
 
 
 class _CONSTANTS:

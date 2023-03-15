@@ -1,4 +1,4 @@
 #!/bin/sh
-rm -r tapy
-mkdir tapy
-cp -r tapy_nightly/* tapy/
+rm -r txtadv
+mkdir txtadv
+cp -r txtadv_nightly/* txtadv/

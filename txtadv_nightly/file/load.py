@@ -6,8 +6,8 @@ import marshal
 import pickle
 import json
 from .. import messaging
-from .. import __init__ as tapy
-savepath = os.path.dirname(inspect.getfile(tapy)) + "/saves"
+from .. import __init__ as txtadv
+savepath = os.path.dirname(inspect.getfile(txtadv)) + "/saves"
 
 
 class Call:

@@ -1,8 +1,8 @@
-"""The messaging/error components of tapy."""
+"""The messaging/error components of txtadv."""
 from inspect import FrameInfo
 import inspect
 
-from tapy.color import colored
+from txtadv.color import colored
 
 
 def no_origin():

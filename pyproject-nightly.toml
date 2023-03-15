@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "tapy_nightly"
+name = "txtadv_nightly"
 version = "110105103104116108121110105103104116108121.0"
-description = "The nightly version of tapy, a feature-rich text adventure library!"
-readme = {file = "tapy-nightly/BUILD_DESC.md", content-type = "text/markdown"}
+description = "The nightly version of txtadv, a feature-rich text adventure library!"
+readme = {file = "txtadv_nightly/BUILD_DESC.md", content-type = "text/markdown"}
 authors = ["sdft <averse.abfun@gmail.com>"]
 packages = [
-    { include = "tapy-nightly" }
+    { include = "txtadv-nightly" }
 ]
 
 [tool.poetry.dependencies]

@@ -1,7 +1,7 @@
-"""The command-related stuff in tapy."""
-from tapy.location import get_loc_from_num as _get_loc_from_num
-from tapy.messaging import error, info, setinfomode, no_origin, origin
-from tapy.color import colored
+"""The command-related stuff in txtadv."""
+from txtadv.location import get_loc_from_num as _get_loc_from_num
+from txtadv.messaging import error, info, setinfomode, no_origin, origin
+from txtadv.color import colored
 
 
 class Command:

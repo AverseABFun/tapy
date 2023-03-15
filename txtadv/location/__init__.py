@@ -1,4 +1,4 @@
-"""Location-related utilites in tapy. Some of these are copied in modules in tapy."""
+"""Location-related utilites in txtadv. Some of these are copied in modules in txtadv."""
 def get_loc_from_num(num):
     """Gets a location string from a number."""
     if num == 0:

@@ -1,4 +1,4 @@
-# tapy
+# txtadv
 WIP Python text adventure framework designed to be feature-rich and require minimal setup.
 
 ## Contributing

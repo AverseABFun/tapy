@@ -1,9 +1,13 @@
-"""Tests for tapy"""
+"""Tests for txtadv"""
 from os import system
-from tapy import Room, Item, Entity, World
+from txtadv import Room, Item, Entity, World
 if __name__ == "__main__":
-    system("pip install pylint")
-    system("pylint */*.py */*/*.py")
+    try:
+        import pylint
+    except ImportError:
+        system("pip install pylint")
+        import pylint
+    system("pylint txtadv_nightly/*.py txtadv_nightly/*/*.py")
     testroom = Room("testroom", "a room", [], [])
     testroom.exits = [
         testroom, testroom, testroom, testroom, testroom, testroom
