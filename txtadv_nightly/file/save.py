@@ -42,5 +42,10 @@ class Call:
         pickle.dump(copy,open(savepath+"/"+item.__name__,'wb'))
         return pickle.dumps(copy)
 
+    def save_to_file(self, item):
+        data = self(item)
+        with open(item.__name__ + '.' + item.__class__.__name__, 'w') as file:
+            file.write(data)
+
 
 sys.modules[__name__] = Call()
