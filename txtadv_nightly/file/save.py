@@ -35,9 +35,10 @@ class Call:
 
     def __call__(self, item):
         copy = {}
-        for ite in item.__class__.save:
+        for ite in item.__class__.save.append("__class__"):
             copy[ite] = self.single_save(item.__getitem__(ite))
-            #pylint: disable-next=consider-using-with
+        copy["__VERSION__"] = txtadv.__VERSION__
+        #pylint: disable-next=consider-using-with
         pickle.dump(copy,open(savepath+"/"+item.__name__,'wb'))
         return pickle.dumps(copy)
 

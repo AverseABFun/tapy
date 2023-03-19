@@ -1,4 +1,5 @@
 """A implementation of colored text."""
+import os
 BLACK = "\u001b[30m"
 GREY = "\u001b[30m"
 GRAY = "\u001b[30m"
@@ -21,3 +22,8 @@ def colored(text, color):
     if color.startswith('\u001b'):
         return color + text + RESET
     return globals()[color.upper()] + text + RESET
+
+def background_color(color):
+    """Set the background color. DOES NOT EXCEPT RGB COLOR STRINGS!"""
+    os.system('setterm -term linux -back $'+color+' -fore white -clear')
+    

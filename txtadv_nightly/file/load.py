@@ -34,19 +34,25 @@ class Call:
                             sys.stdout)
                         return bytes()
 
-    def __call__(self, file):
+    def __call__(self, filename):
         try:
             #pylint: disable-next=consider-using-with
-            file = pickle.load(open(file,'rb'))
+            file = pickle.load(open(filename+".save",'rb'))
         except (FileNotFoundError, IsADirectoryError, TypeError, pickle.UnpicklingError):
-            messaging.error("Attempted load of invalid save/nonexistant save!\n",sys.stdout)
+            #pylint: disable-next=line-too-long
+            messaging.error(f"Attempted load of invalid save/nonexistant save {filename}!\n",sys.stdout)
             return
         if file.__class__.__name__ != "dict":
-            messaging.error("Attempted load of invalid save/nonexistant save!\n",sys.stdout)
+            messaging.error(f"Attempted load of invalid save {filename}!\n",sys.stdout)
             return
+        if file["__VERSION__"] != txtadv.__VERSION__:
+            #pylint: disable-next=line-too-long
+            file_version = file["__VERSION__"] # I do this instead of putting it in the f-string directly because for some reason if I do, pylint and python get VERY mad
+            #pylint: disable-next=line-too-long
+            messaging.error(f"Attempted load of save {filename} which has a file version of {file_version}, but this copy of txtadv is still on version {txtadv.__VERSION__}!\n",sys.stdout)
         copy = {}
         for ite in file.items():
-            copy[ite] = self.single_load(item.__getitem__(ite))
+            copy[ite] = self.single_load(ite)
 
 
 sys.modules[__name__] = Call()

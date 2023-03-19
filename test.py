@@ -3,7 +3,11 @@ from os import system
 from txtadv import Room, Item, Entity, World
 if __name__ == "__main__":
     try:
-        import pylint
+        try:
+            import pylint
+        except ValueError:
+            system("find . -name '*.pyc' -delete")
+            import pylint
     except ImportError:
         system("pip install pylint")
         import pylint

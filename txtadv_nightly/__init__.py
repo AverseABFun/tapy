@@ -1,9 +1,11 @@
 """A feature-rich text adventure framework in Python."""
 import sys
 import os
-from typing import Callable, Any, List
+from typing import List
 from txtadv import commands
 from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
+
+__version__ = 1.0
 
 
 class _CONSTANTS:
@@ -30,7 +32,7 @@ class Subscriber:
     def __call__(self, *args, **kwargs):
         self.func(*args, **kwargs)
 
-    def __set__(self, key, val):
+    def __setitem__(self, key, val):
         self.events.append(val)
 
     def subscribe(self, event):
@@ -141,6 +143,7 @@ class Room:
     """The Room class can contain a number of items and have up to 6 exits:
     up, down, north, south, east, and west."""
     events = {"enter": EnterEvent()}
+    save   = ["name","desc","exits","items"]
 
     def __init__(self, name: str, desc: str, exits, items) -> None:
         self.name = name
@@ -320,13 +323,11 @@ class World:
                             cmd(inp, self, player)
                             found = True
                             break
-                        cmd_count += 1
-                    cmd_count -= len(cmd.aliases)
                     if not found:
                         cmd_count += 1
                     else:
                         break
-                if cmd_count == len(self.cmds) and not inp == "":
+                if not found and not inp == "":
                     err(
                         "Invalid command. Run 'help' to get a list of commands.\n",
                         player)
