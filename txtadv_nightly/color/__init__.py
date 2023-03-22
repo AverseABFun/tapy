@@ -24,6 +24,6 @@ def colored(text, color):
     return globals()[color.upper()] + text + RESET
 
 def background_color(color):
-    """Set the background color. DOES NOT EXCEPT RGB COLOR STRINGS!"""
-    os.system('setterm -term linux -back $'+color+' -fore white -clear')
+    """Set the background color. Only accepts colors in the form 'red' or 'green', not txtadv.color.RED or \u001b[36m"""
+    os.system('setterm -term linux -back '+color)
     

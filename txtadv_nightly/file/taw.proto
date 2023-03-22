@@ -1,0 +1,27 @@
+syntax = "proto2";
+
+package taw;
+
+message Script {
+    optional string label = 1;
+    
+    enum ScriptType {
+        NATIVEPY = 0;
+    //    TACODE = 1; // For future use
+    }
+    
+    message Code {
+        optional string script = 1;
+        optional ScriptType type = 2 [default = NATIVEPY];
+    }
+    
+    optional Code code = 4;
+}
+
+message World {
+    message Command {
+        repeated string aliases = 1;
+        optional Script code = 2;
+    }
+    repeated Command commands = 1;
+}

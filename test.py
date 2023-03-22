@@ -1,6 +1,8 @@
 """Tests for txtadv"""
 from os import system
-from txtadv import Room, Item, Entity, World
+from txtadv_nightly import Room, Item, Entity, World
+import txtadv_nightly.color
+import subprocess
 if __name__ == "__main__":
     try:
         try:
@@ -10,7 +12,11 @@ if __name__ == "__main__":
             import pylint
     except ImportError:
         system("pip install pylint")
-        import pylint
+        try:
+            import pylint
+        except ValueError:
+            system("find . -name '*.pyc' -delete")
+            import pylint
     system("pylint txtadv_nightly/*.py txtadv_nightly/*/*.py")
     testroom = Room("testroom", "a room", [], [])
     testroom.exits = [
@@ -21,4 +27,5 @@ if __name__ == "__main__":
     testentity = Entity(testroom, "test.entity")
     testworld = World(testroom)
     testworld.add_entity(testentity)
+    txtadv_nightly.color.background_color('blue ')
     testworld.run()

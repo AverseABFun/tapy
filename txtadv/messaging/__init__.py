@@ -56,9 +56,9 @@ def ocolored(message, target, color):
                 target.write(message)
     except AttributeError:
         if inspect.stack == origin:
-            target.write(inspect.stack()[1].function.upper() + ": " + message)
+            target.outstream.write(inspect.stack()[1].function.upper() + ": " + message)
         else:
-            target.write(message)
+            target.outstream.write(message)
     try:
         target.outstream.flush()
     except AttributeError:

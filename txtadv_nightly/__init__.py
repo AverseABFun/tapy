@@ -291,7 +291,7 @@ class World:
     def __init__(
             self,
             start: Room,
-            cmds: List[commands.Command] = _CONSTANTS.global_cmds) -> None:
+            cmds = _CONSTANTS.global_cmds) -> None:
         self.start = start
         if callable(cmds):
             self.cmds = cmds()
