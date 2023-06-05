@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "txtadv_nightly"
-version = "110105103104116108121110105103104116108121.1"
+version = "110105103104116108121110105103104116108121.2"
 description = "The nightly version of txtadv, a feature-rich text adventure library!"
 readme = "txtadv_nightly/BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]

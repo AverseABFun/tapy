@@ -7,7 +7,6 @@ import pickle
 import json
 from .. import messaging
 from .. import __init__ as txtadv
-import taw_pb2 as tawpb
 savepath = os.path.dirname(inspect.getfile(txtadv)) + "/saves"
 
 

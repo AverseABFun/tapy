@@ -1,7 +1,6 @@
 """A feature-rich text adventure framework in Python."""
 import sys
 import os
-from typing import List
 from txtadv import commands
 from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
 
@@ -226,7 +225,7 @@ class Player(Object):
 
 
 class Entity(Player):
-    """An Entity. Can be described as a scripted player."""
+    """An Entity. Can be described as a scripted player.(NOTE: Still very much in development. We suggest not using it currently."""
 
     def __init__(self, startloc: Room, file_name: str):
         self.colored = False
@@ -239,13 +238,12 @@ class Entity(Player):
 
     def exec_from_file(self, file_name):
         """Set the file executed from"""
-        with open(file_name, 'r', encoding='ascii') as file:
-            self.instream = file
+        self.file_name = file_name
+        self.instream = open(self.file_name, 'r', encoding='ascii')
 
     def tick(self, world):
         """Tickes the entity and makes it perform an action."""
         #pylint: disable=consider-using-with
-        self.instream = open(self.file_name, 'r', encoding='ascii')
         self.outstream = open(os.devnull, 'w', encoding='ascii')
         #pylint: enable=consider-using-with
         self.exec(self.instream.readline(), world)
@@ -344,7 +342,7 @@ class World:
 
     def new_chat(self, message, source, local=None) -> None:
         #pylint: disable-next=line-too-long
-        """DO NOT USE. Instead run World.chat_event.trigger(message: str, source: str, local: NoneType or Room"""
+        """DO NOT USE. Instead run World.chat_event.trigger(message: str, source: str, local: NoneType or Room)"""
         self.chat.append(source + " says: " + message)
         setinfomode(no_origin)
         if local is None:

@@ -1,2 +1,2 @@
 #!/bin/bash
-protoc/bin/protoc -I=./txtadv_nightly/file --python_out=./txtadv_nightly/file ./txtadv_nightly/file/taw.proto
+protoc/bin/protoc -I=./txtadv_nightly/multiplayer --python_out=./txtadv_nightly/multiplayer ./txtadv_nightly/multiplayer/taw.proto
