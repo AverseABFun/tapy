@@ -37,10 +37,17 @@ class Call:
         copy = {}
         for ite in item.__class__.save.append("__class__"):
             copy[ite] = self.single_save(item.__getitem__(ite))
-        copy["__VERSION__"] = txtadv.__VERSION__
+        #pylint: disable-next=no-member
+        copy["__VERSION__"] = txtadv.__version__
         #pylint: disable-next=consider-using-with
         pickle.dump(copy,open(savepath+"/"+item.__name__,'wb'))
         return pickle.dumps(copy)
+
+    def save_to_file(self, item):
+        """Save to a file"""
+        data = self(item)
+        with open(item.__name__ + '.' + item.__class__.__name__, 'wb') as file:
+            file.write(data)
 
 
 sys.modules[__name__] = Call()

@@ -4,7 +4,7 @@ import os
 from txtadv import commands
 from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
 
-__version__ = 1.0
+__version__ = "0.4.0"
 
 
 class _CONSTANTS:
@@ -225,6 +225,7 @@ class Player(Object):
 
 
 class Entity(Player):
+    #pylint: disable-next=line-too-long
     """An Entity. Can be described as a scripted player.(NOTE: Still very much in development. We suggest not using it currently."""
 
     def __init__(self, startloc: Room, file_name: str):
@@ -235,18 +236,19 @@ class Entity(Player):
         with open(file_name, 'r', encoding='ascii') as file:
             with open(os.devnull, 'w', encoding='ascii') as null:
                 super().__init__(startloc, file, null, colored=False)
+                self.instream = file
 
     def exec_from_file(self, file_name):
         """Set the file executed from"""
         self.file_name = file_name
+        #pylint: disable-next=consider-using-with
         self.instream = open(self.file_name, 'r', encoding='ascii')
 
     def tick(self, world):
         """Tickes the entity and makes it perform an action."""
-        #pylint: disable=consider-using-with
-        self.outstream = open(os.devnull, 'w', encoding='ascii')
-        #pylint: enable=consider-using-with
-        self.exec(self.instream.readline(), world)
+        #pylint: disable-next=consider-using-with
+        #self.outstream = open(os.devnull, 'w', encoding='ascii')
+        #self.exec(self.instream.readline(), world)
 
     def exec(self, instruction, world):
         """Executes an instruction for this Entity."""
@@ -308,7 +310,6 @@ class World:
             for player in self.players:
                 setinfomode(no_origin)
                 info(player.loc.name + prompt, player)
-                player.outstream.flush()
                 sys.tracebacklimit = -1
                 inp = player.instream.readline().replace("\n", "")
                 sys.tracebacklimit = 1000

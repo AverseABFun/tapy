@@ -27,5 +27,5 @@ if __name__ == "__main__":
     testentity = Entity(testroom, "test.entity")
     testworld = World(testroom)
     testworld.add_entity(testentity)
-    txtadv_nightly.color.background_color('blue ')
+    txtadv_nightly.color.background_color('blue')
     testworld.run()

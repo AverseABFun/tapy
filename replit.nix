@@ -1,5 +1,6 @@
 { pkgs }: {
   deps = [
+    pkgs.file-rename
     pkgs.unzip
     pkgs.wget
     pkgs.python310Full
