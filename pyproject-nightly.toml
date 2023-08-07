@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "txtadv_nightly"
-version = "110105103104116108121110105103104116108121.2"
+version = "1.0beta1"
 description = "The nightly version of txtadv, a feature-rich text adventure library!"
-readme = "txtadv_nightly/BUILD_DESC.md"
+readme = "txtadv/BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
 license = "MIT"
 packages = [
-    { include = "txtadv_nightly" }
+    { include = "txtadv" }
 ]
 
 [tool.poetry.dependencies]

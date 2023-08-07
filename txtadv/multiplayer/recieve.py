@@ -1,10 +1,18 @@
-"""Recieving messages on a multiplayer game(VERY WIP) (Doesn't work)"""
-import taw_proto.taw as taw_proto
+"""Recieving messages on a multiplayer game"""
+from txtadv.multiplayer import SERVER
 import txtadv
+import asyncio
+import requests
+import json
+
 class RecieveEvent(txtadv.Event):
-    def __init__(self, event):
+    def __init__(self, event: type):
         super(self,RecieveEvent).__init__()
-        self.listenFor(event)
-    def listenFor(self, event):
-        if type(event).__name__ != "txtadv.multiplayer.taw_proto.taw":
-            raise TypeError(f"variable 'event' is from an invalid module {type(event).__name__}, expected to be from txtadv.multiplayer.taw_proto.taw")
+        asyncio.ensure_future(self.listenFor(event))
+    async def listenFor(self, event: type):
+        if not event==txtadv.Event:
+            raise TypeError("event is incorrect type, expected txtadv.Event")
+        while True:
+            data = requests.get(SERVER + "/event/" + event.__name__)
+            if json.loads(data).response!=None:
+                self.trigger(data=json.loads(data))

@@ -46,7 +46,7 @@ class Subscriber:
 
 class Event:
     """An Event that can have multiple Subscribers"""
-    save = []
+    save = ["subscribers"]
 
     def __init__(self):
         self.subscribers = []
@@ -223,6 +223,12 @@ class Player(Object):
         """Pickup an item."""
         item.move(self.inventory)
 
+    def __repr__(self):
+        return f"{self.__class__}({self.__dict__})"
+
+    def __str__(self):
+        return self.name
+
 
 class Entity(Player):
     #pylint: disable-next=line-too-long
@@ -291,13 +297,17 @@ class World:
     def __init__(
             self,
             start: Room,
-            cmds = _CONSTANTS.global_cmds) -> None:
+            cmds = _CONSTANTS.global_cmds,
+            stdoutin = True) -> None:
         self.start = start
         if callable(cmds):
             self.cmds = cmds()
         else:
             self.cmds = cmds
-        self.players = [Player(start, sys.stdin, sys.stdout)]
+        if stdoutin:
+            self.players = [Player(start, sys.stdin, sys.stdout)]
+        else:
+            self.players = []
         self.entities = []
         self.chat = []
         self.chat_event = ChatEvent()
@@ -326,9 +336,9 @@ class World:
                         cmd_count += 1
                     else:
                         break
-                if not found and not inp == "":
+                if not found:
                     err(
-                        "Invalid command. Run 'help' to get a list of commands.\n",
+                        "Pardon?\n",
                         player)
             for i in self.entities:
                 i.tick(self)
@@ -341,9 +351,14 @@ class World:
         """Adds an Entity to this World."""
         self.entities.append(entity)
 
+    def send_chat(self, message: str, source: str, local=None) -> None:
+        #pylint: disable-next=line-too-long
+        """Sends a chat. Use local to make only Entities in that room be able to see it, or just keep it as None. You also have to set the source to a name or Entity/Player."""
+        self.chat_event.trigger(message, source, local=local)
+
     def new_chat(self, message, source, local=None) -> None:
         #pylint: disable-next=line-too-long
-        """DO NOT USE. Instead run World.chat_event.trigger(message: str, source: str, local: NoneType or Room)"""
+        """DO NOT USE. Instead run World.send_chat(message: str, source: str, local: NoneType or Room)"""
         self.chat.append(source + " says: " + message)
         setinfomode(no_origin)
         if local is None:
