@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "txtadv"
-version = "1.0-beta4"
+version = "1.0-beta3"
 description = "A feature-rich text adventure library! Easy to code in and relativly intuitive, and then compile your adventure to a custom story file format!"
 readme = "BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
