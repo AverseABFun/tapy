@@ -1,6 +1,8 @@
-name: Upload Nightly Python Package
+name: Upload Prerelease Python Package
 
-on: push
+on:
+  release:
+    types: [prereleased]
 
 permissions:
   contents: read
@@ -20,10 +22,6 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install poetry
-    - name: Use pyproject-nightly.toml
-      run: |
-        rm pyproject.toml
-        mv pyproject-nightly.toml pyproject.toml
     - name: Build package
       run: |
         poetry build
