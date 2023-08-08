@@ -1,16 +1,27 @@
 [tool.poetry]
 name = "txtadv"
-version = "1.0"
+version = "1.0.1"
 description = "A feature-rich text adventure library! Easy to code in and relativly intuitive, perfect for beginners!"
 readme = "txtadv/BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
 license = "MIT"
+homepage = "https://pypi.org/project/txtadv"
+repository = "https://github.com/AverseABFun/txtadv"
+keywords = ["game","adventure","engine","txtadv","easy"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Topic :: Games/Entertainment"
+]
 packages = [
     { include = "txtadv" }
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.10.0,<3.11"
+python = "^3.8"
 
 [tool.poetry.dev-dependencies]
 
