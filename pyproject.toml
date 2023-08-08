@@ -11,10 +11,6 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"
-pylint = "^2.17.0"
-
-[tool.poetry.extras]
-pylint = ["^2.17.4"]
 
 [tool.poetry.dev-dependencies]
 
