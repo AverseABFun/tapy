@@ -76,10 +76,6 @@ class UseEvent(Event):
     """A Event that is triggered when an Item is used."""
 
 
-class DropEvent(Event):
-    """A Event that is triggered when something is dropped."""
-
-
 class EnterEvent(Event):
     """A Event that is triggered when a Player enters a Room."""
 
@@ -201,7 +197,7 @@ numPlayers = 0
 
 class Player(Object):
     """A Player. Don't use, instead use World.create_player or just instance a new World."""
-    events = Object.events.update({"get": MoveEvent()})
+    events = Object.events.update({})
     default_flags = {}
 
     #pylint: disable-next=too-many-arguments
@@ -226,8 +222,6 @@ class Player(Object):
     def pickup(self, item: Item):
         """Pickup an item."""
         item.move(self.inventory)
-        self.events["get"].trigger(player=self, item=item)
-
 
     def __repr__(self):
         return f"{self.__class__}({self.__dict__})"

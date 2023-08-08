@@ -1,9 +1,9 @@
 """Sending multiplayer events"""
 
-import json
 from txtadv.multiplayer import SERVER
 import txtadv
 import requests
+import json
 
 def SendEvent(event: txtadv.Event) -> bool:
     if not event==txtadv.Event:

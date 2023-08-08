@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "txtadv"
-version = "1.0-beta4"
-description = "A feature-rich text adventure library! Easy to code in and relativly intuitive, and then compile your adventure to a custom story file format!"
+version = "1.0-beta3"
+description = "A feature-rich text adventure library! Supports story files, although currently only a custom format."
 readme = "BUILD_DESC.md"
 authors = ["sdft <averse.abfun@gmail.com>"]
 license = "MIT"
@@ -12,8 +12,12 @@ packages = [
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.11"
 pylint = "^2.17.0"
+# Optional dependencies:
+pynecone = { version = "^0.1.20", optional = true }
+betterproto = {extras = ["compiler"], version = "^1.2.5"}
 
 [tool.poetry.extras]
+web = ["pynecone"]
 pylint = ["^2.17.4"]
 
 [tool.poetry.dev-dependencies]
