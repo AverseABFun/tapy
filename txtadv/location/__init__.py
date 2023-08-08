@@ -11,7 +11,9 @@ def get_loc_from_num(num):
         return 'west'
     if num == 4:
         return 'up'
-    return 'down'
+    if num == 5:
+        return 'down'
+    return 'unknown'
 
 
 def get_num_from_loc(loc):
@@ -27,4 +29,16 @@ def get_num_from_loc(loc):
         return 3
     if loc in ['up', 'u']:
         return 4
-    return 5
+    if loc in ['down', 'd']:
+        return 5
+    return -1
+
+def loc_dict_to_list(loc: dict) -> list:
+    """Converts a location dictionary({'north':room}, for example) to a list"""
+    result = [None,None,None,None,None,None]
+    for key,value in loc.items():
+        num = get_num_from_loc(key)
+        if num == -1:
+            raise KeyError(f"Invalid key \"{key}\", not a expected direction value")
+        result[num] = value
+    return result

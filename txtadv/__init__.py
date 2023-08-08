@@ -3,8 +3,9 @@ import sys
 import os
 from txtadv import commands
 from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
+import txtadv.color
 
-__version__ = "0.4.0"
+__version__ = "1.0.1"
 
 
 class _CONSTANTS:
