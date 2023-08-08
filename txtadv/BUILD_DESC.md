@@ -1,4 +1,4 @@
 # txtadv
-txtadv_nightly is the nightly version of txtadv, the feature-rich text adventure library! Check out txtadv at [pypi.org/project/txtadv/](https://pypi.org/project/txtadv/)
 =======
-txtadv is the feature-rich text adventure library! Check out txtadv's source at [https://github.com/AverseABFun-Windows/tapy](https://github.com/AverseABFun-Windows/tapy)
+txtadv is a feature-rich text adventure library! Easy to code in and relativly intuitive, perfect for beginners! Just install the library, with no dependencies other then the built-in libraries, for all computers.
+Documentation is on it's way, I just wanted to get something out!
