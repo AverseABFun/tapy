@@ -1,7 +1,9 @@
-name: Upload Nightly Python Package
+name: Upload Prerelease Python Package
 
-on: push
-
+on:
+  release:
+    types: [prereleased]
+  
 permissions:
   contents: read
 
