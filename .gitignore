@@ -131,3 +131,4 @@ dmypy.json
 # Tapy files
 *.entity
 *.world
+*.tasave

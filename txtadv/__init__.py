@@ -3,7 +3,7 @@ import sys
 import os
 from txtadv import commands
 from txtadv.messaging import info, setinfomode, no_origin, origin, error as err
-import txtadv.color
+import random
 
 __version__ = "1.0.1"
 
@@ -110,7 +110,7 @@ class Object:
     def move(self, newloc):
         """Moves this Object to a different Room"""
         self.loc = newloc
-        self.__class__.events["move"].trigger(self.iname)
+        #self.events["move"].trigger(self.iname)
 
     def on_event(self, event_name: str, subscriber: Subscriber):
         """Makes subscriber be triggered when event_name is triggered."""
@@ -135,17 +135,19 @@ class Item(Object):
         location.items.append(self)
 
     def move(self, newloc):
+        self.loc.items.remove(self)
         super().move(newloc)
         newloc.items.append(self)
 
     def use(self):
         """Use the item"""
         self.__class__.events["use"].trigger(self.iname)
+    
 
 
 class Room:
     """The Room class can contain a number of items and have up to 6 exits:
-    up, down, north, south, east, and west."""
+    north, south, east, west, up, and down."""
     events = {"enter": EnterEvent()}
     save   = ["name","desc","exits","items"]
 
@@ -217,17 +219,19 @@ class Player(Object):
         numPlayers += 1
         if name == "Player":
             name = "Player" + str(numPlayers)
-        super().__init__("player", "", "", startloc)
+        super().__init__(name, "", "", startloc)
         self.inventory = Room("Inventory", "How did you get here?", [], [])
         self.instream = instream
         self.outstream = outstream
         self.colored = colored
         self.name = name
+        self.transcript = []
+        self.commands = []
 
     def pickup(self, item: Item):
         """Pickup an item."""
         item.move(self.inventory)
-        self.events["get"].trigger(player=self, item=item)
+        #self.events["get"].trigger(player=self, item=item)
 
 
     def __repr__(self):
@@ -299,14 +303,20 @@ class Entity(Player):
 
 
 class World:
-    """The World class. Contains a starting room, a list of commands, and at least one player."""
+    """The World class. Houses all of the information pertaining to the game."""
 
     def __init__(
             self,
             start: Room,
+            author = "",
+            name = "",
+            desc = "",
             cmds = _CONSTANTS.global_cmds,
             stdoutin = True) -> None:
         self.start = start
+        self.author = author
+        self.name = name
+        self.desc = desc
         if callable(cmds):
             self.cmds = cmds()
         else:
@@ -315,8 +325,10 @@ class World:
             self.players = [Player(start, sys.stdin, sys.stdout)]
         else:
             self.players = []
+        self.invalid_text = ["Pardon?","A fantastical idea!","What does that mean?","I don't understand."]
         self.entities = []
         self.chat = []
+        self.states = []
         self.chat_event = ChatEvent()
         self.chat_subscriber = Subscriber(self.new_chat)
         self.chat_event.add_subscriber(self.chat_subscriber)
@@ -326,16 +338,18 @@ class World:
         while True:
             for player in self.players:
                 setinfomode(no_origin)
+                self.states.append(self)
                 info(player.loc.name + prompt, player)
                 sys.tracebacklimit = -1
                 inp = player.instream.readline().replace("\n", "")
+                player.commands.append(inp)
                 sys.tracebacklimit = 1000
                 cmd_count = 0
                 found = False
                 for cmd in self.cmds:
                     for alias in cmd.aliases:
-                        if inp.lower().startswith(alias.lower()):
-                            setinfomode(origin)
+                        if inp.split(" ")[0].lower().startswith(alias.lower()):
+                            setinfomode(no_origin)
                             cmd(inp, self, player)
                             found = True
                             break
@@ -345,7 +359,7 @@ class World:
                         break
                 if not found:
                     err(
-                        "Pardon?\n",
+                        f"{random.choice(self.invalid_text)}\n",
                         player)
             for i in self.entities:
                 i.tick(self)

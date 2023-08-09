@@ -57,14 +57,18 @@ def ocolored(message, target, color):
                     colored(
                         inspect.stack()[1].function.upper() + ": " + message,
                         color))
+                target.transcript.append(inspect.stack()[1].function.upper() + ": " + message)
             else:
                 target.outstream.write(colored(message, color))
+                target.transcript.append(message)
         else:
             if inspect.stack == origin:
                 target.outstream.write(inspect.stack()[1].function.upper() +
                                        ": " + message)
+                target.transcript.append(inspect.stack()[1].function.upper() + ": " + message)
             else:
                 target.outstream.write(message)
+                target.transcript.append(message)
     if write:
         target.flush()
     else:

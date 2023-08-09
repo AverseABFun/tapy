@@ -1,7 +1,11 @@
 """The command-related stuff in txtadv."""
-from txtadv.location import get_loc_from_num as _get_loc_from_num
+from txtadv.location import get_loc_from_num, get_num_from_loc
 from txtadv.messaging import error, info, setinfomode, no_origin, origin
 from txtadv.color import colored
+import random
+import sys
+import pickle
+import datetime
 
 
 class Command:
@@ -55,7 +59,7 @@ def look(inp, _world, player):
         info("There are exits ", player)
     for index, val in enumerate(player.loc.exits):
         if val:
-            loc = _get_loc_from_num(index)
+            loc = get_loc_from_num(index)
             res = ''
             if loc == 'up':
                 loc = 'above you'
@@ -97,7 +101,7 @@ def examine(inp, _world, player):
 
 def tahelp(inp, world, player):
     """The help command. Named 'tahelp' so that it won't override the builtin function 'help'"""
-    inp = inp.replace("help", "", 1).strip()
+    inp = inp.replace("help", "", 1).strip().replace("h", "", 1).strip()
     setinfomode(no_origin)
     if inp != "":
         for i in world.cmds:
@@ -109,18 +113,34 @@ def tahelp(inp, world, player):
             "There's no command with that name! Run 'help' to get a list of commands.\n",
             player)
     for index, val in enumerate(world.cmds):
-        if val.name in ["if", "said"
-                        ] and not player.__class__.__name__ == "Entity":
-            continue
         if index % 2 == 0:
             info(colored(val.help() + '\n', 'yellow'), player)
         elif index % 2 == 1:
             info(colored(val.help() + '\n', 'blue'), player)
     setinfomode(origin)
 
+def about(_inp, world, player):
+    info(f"{world.name} by {world.author}\n", player)
+    info(f"{world.desc}\n", player)
 
-def move(_inp, _world, _player):
+
+def move(inp, _world, player):
     """Go in a specific direction"""
+    inp = inp.replace("go", "", 1).strip()
+    inp = inp.replace("move", "", 1).strip()
+    dir = get_num_from_loc(inp)
+    if dir == -1:
+        error("What direction is that?\n", player)
+        return
+    player.move(player.loc.exits[dir])
+    look("look",_world,player)
+
+
+def moveCommand(dir):
+    """Create a move command for a specific direction"""
+    def func(_inp,_world,_player):
+        move(f"go {dir}",_world,_player)
+    return Command(dir,func,f"Go {dir}","I mean, isn't it obvious?",aliases=[str(dir)[0]])
 
 
 def say(inp, world, player):
@@ -143,9 +163,9 @@ def list_chat(_inp, world, player):
     setinfomode(origin)
 
 
-def taif(inp, world, player):
+"""def taif(inp, world, player):
     #pylint: disable-next=line-too-long
-    """For Entities, this command is useful for shops or other similar things, because you can test if the player says or does something."""
+    \"""For Entities, this command is useful for shops or other similar things, because you can test if the player says or does something.\"""
     inp = inp.replace("if", "", 1).strip()
     try:
         result = player.exec(inp.replace("}", "", 1).strip(), world)
@@ -160,7 +180,7 @@ def taif(inp, world, player):
 
 
 def said(inp, world, player):
-    """Test if something has been said(for entities only)"""
+    \"""Test if something has been said(for entities only)\"""
     inp = inp.replace("said", "", 1).strip()
     try:
         player.exec("look", world)
@@ -172,7 +192,7 @@ def said(inp, world, player):
         ali = ali.replace(tmp,"").strip()
         if inp in (i, ali):
             return True
-    return False
+    return False"""
 
 def get(inp, _world, player):
     """Get an item"""
@@ -181,18 +201,89 @@ def get(inp, _world, player):
         if i.name == inp:
             player.pickup(i)
             return
-    error("There's no item with that name in the room!", player)
+    error("There's no item with that name in the room!\n", player)
+
+
+def drop(inp, _world, player):
+    """Drop an item"""
+    inp = inp.replace("drop", "", 1).strip()
+    for i in player.inventory.items:
+        if i.name == inp:
+            i.move(player.loc)
+            return
+    error("There's no item with that name in your inventory!\n", player)
+
+def inventory(_inp, _world, player):
+    if len(player.inventory.items)==0:
+        info("You have nothing.\n", player)
+        return
+    for i in player.inventory.items:
+        info(f"{i.name}: {i.sdesc}\n", player)
+
+def wait(_inp, _world, player):
+    info("Time passes.\n", player)
+
+def again(inp, world, player):
+    """Perform a command again"""
+    inp = player.commands[-2]
+    cmd_count = 0
+    found = False
+    for cmd in world.cmds:
+        for alias in cmd.aliases:
+            if inp.lower().startswith(alias.lower()):
+                setinfomode(origin)
+                cmd(inp, world, player)
+                found = True
+                break
+        if not found:
+            cmd_count += 1
+        else:
+            break
+    if not found:
+        error(
+            f"{random.choice(world.invalid_text)}\n",
+        player)
+
+#def undo(_inp, world, player):
+#    state = world.states[-2]
+#    world.__dict__ = state.__dict__
+
+def quit(_inp, world, _player):
+    """Quit the game"""
+    sys.exit(0)
+
+def save(inp, world, player):
+    inp = inp.replace("save", "", 1).strip()
+    game = {"player": {"inventory": player.inventory, "loc": player.loc}}
+    pickle.dump(game, open(f"txtadv/saves/{inp or datetime.datetime.now().ctime()}.tasave","wb"))
+    info("Saved.\n", player)
+
+def load(inp, world, player):
+    inp = inp.replace("load", "", 1).strip().replace("restore", "", 1).strip()
+    for key, value in enumerate(pickle.load(open(f"txtadv/saves/{inp}.tasave", "rb"))["player"]):
+        world.players[0].__dict__[key] = value
+    info("Loaded.\n", player)
 
 
 globalcmds = [
-    Command("help", tahelp, "Get help on the commands",
-            "It's the help command"),
+    Command("save", save, "Save the game", "Good idea before doing something risky."),
+    Command("load", load, "Load a save", "Restore a save.", aliases=["restore"]),
+    Command("quit", quit, "Quit the game", "Chicken!",aliases=["q"]),
+    Command("help", about, "Get help on the commands",
+            "It's the help command", aliases=["about"]),
     Command("look", look, "Look around the room",
-            "Look at the room that the current player is in"),
+            "Look at the room that the current player is in", aliases=["l"]),
     Command("examine", examine, "Examine an item",
-            "Examine an item closely to get more info"),
+            "Examine an item closely to get more info", aliases=["x"]),
     Command("go", move, "Go in a direction", "Go in a certain direction",
             ["move"]),
+    #Command("undo", undo, "Undo a command", "Undo a command"),
+    moveCommand("north"),
+    moveCommand("south"),
+    moveCommand("east"),
+    moveCommand("west"),
+    moveCommand("up"),
+    moveCommand("down"),
     Command(
         "say", say, "Say something to the room you are currently in",
         "Unlike 'announce', it will only say something to the room you are currently in"
@@ -201,7 +292,10 @@ globalcmds = [
             "Unlike 'say', this command says something to the entire World"),
     Command("chat", list_chat, "List the chat messages",
             "That's pretty much it", ["list chat"]),
-    Command("get", get, "Take/get an item", "Are you a 'TAKE' person or a 'GET' person?", ["take"]),
-    Command("if", taif, "", ""),
-    Command("said", said, "", "")
+    Command("get", get, "Get an item", "You monster!"),
+    Command("take", get, "Take an item", "Good. I can trust you."),
+    Command("drop", drop, "Drop an item", "That's it."),
+    Command("inventory", inventory, "Show your inventory", "See the items you have", aliases=["i"]),
+    Command("wait", wait, "Wait a turn", "Might be useful, might not. Who knows.", aliases=["z"]),
+    Command("again", again, "Perform a command again", "Nice if you need to do something a bunch of times", aliases=["g"])
 ]

@@ -8,6 +8,6 @@ if __name__ == "__main__":
     ]
     testitem = txtadv.Item("a test item", "a test item", "what were you expecting?",
                     testroom)
-    testworld = txtadv.World(testroom)
+    testworld = txtadv.World(testroom, author="Arthur Beck", name="Test Game", desc="A test game")
 
     testworld.run()

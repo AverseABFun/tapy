@@ -3,7 +3,7 @@
 import json
 from txtadv.multiplayer import SERVER
 import txtadv
-import requests
+#import requests
 
 def SendEvent(event: txtadv.Event) -> bool:
     if not event==txtadv.Event:

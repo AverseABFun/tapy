@@ -4,7 +4,7 @@ import json
 from txtadv.multiplayer import SERVER
 import txtadv
 import asyncio
-import requests
+#import requests
 
 class RecieveEvent(txtadv.Event):
     """This event is used to trigger something when a event is recieved"""
